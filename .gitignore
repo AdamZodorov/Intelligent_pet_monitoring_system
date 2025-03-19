@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+go/
+frontend/__pycache__

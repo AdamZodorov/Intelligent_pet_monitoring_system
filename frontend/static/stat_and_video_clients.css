@@ -1,0 +1,105 @@
+/* Сброс базовых отступов и шрифтов */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+/* Основной контейнер */
+.shelter-info-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Заголовок */
+.page-title {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Вывод ID приюта */
+.shelter-id {
+    font-weight: bold;
+    font-size: 20px;
+    color: #333333;
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Контейнер для списка животных (один столбик) */
+.animals-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;             /* Расстояние между элементами */
+    max-height: 400px;     /* Ограничиваем высоту */
+    overflow-y: auto;      /* Включаем вертикальную прокрутку при избытке */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Блок одного животного, сделан в виде ссылки */
+.animal-item {
+    display: block;
+    text-decoration: none; /* Убираем подчеркивание */
+    color: #000000;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    transition: background-color 0.2s;
+}
+
+.animal-item:hover {
+    background-color: #f9f9f9;
+}
+
+.animal-name {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.animal-stats {
+    font-size: 14px;
+    color: #666666;
+}
+
+/* Кнопка для просмотра видеокамер */
+.btn-video {
+    display: block;
+    margin: 20px auto 0; /* Центрируем и добавляем отступ сверху */
+    background-color: #000000;
+    color: #FFFFFF;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.btn-video:hover {
+    background-color: #333333;
+}
+
+.animal-item {
+    display: block;
+    text-decoration: none; /* Убираем подчёркивание */
+    color: inherit;        /* Наследуем цвет текста */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    transition: background-color 0.2s;
+}
+
+.animal-item:hover {
+    background-color: #FFE4E1;
+}

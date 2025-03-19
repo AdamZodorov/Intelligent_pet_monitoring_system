@@ -1,0 +1,84 @@
+/* Сброс отступов и базовые стили */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  color: #333333;
+}
+
+/* Контейнер для всей страницы */
+.container {
+  width: 80%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Заголовок с названием животного */
+.animal-title {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+/* Основной блок с данными: статистика + фото */
+.main-content {
+  display: flex;
+  justify-content: space-between; /* Статистика слева, фото справа */
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+/* Блок со статистикой */
+.stats {
+  width: 45%;
+}
+
+.stats p {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+/* Блок с фото животного */
+.animal-photo {
+  width: 50%;
+  text-align: center; /* Чтобы картинка была по центру внутри блока */
+}
+
+.animal-photo img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px; /* Скруглённые уголки */
+}
+
+/* Кнопки внизу */
+.buttons {
+  display: flex;
+  gap: 10px;          /* Расстояние между кнопками */
+  justify-content: flex-start; /* Выравнивание кнопок слева */
+}
+
+.buttons button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  background-color: #000; /* Чёрный фон */
+  color: #fff;            /* Белый текст */
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.buttons button:hover {
+  background-color: #333; /* При наведении чуть светлее */
+}
+
+
+.buttons button:hover {
+  background-color: #e2e2e2;
+}

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Список камер</title>
+    <!-- Подключаем файл стилей -->
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='cameras_workers.css') }}"
+>
+</head>
+<body>
+
+<main class="camera-main">
+    <h1 class="page-title">Список камер</h1>
+
+    <!-- Секция со списком камер -->
+    <section class="camera-list-container">
+        {% for camera in cameras %}
+        <!-- Каждая камера — кликабельная ссылка (пример) -->
+        <a href="{{ url_for('camera_detail', camera_id=camera.id) }}" class="camera-item">
+            <h3 class="camera-name">{{ camera.name }}</h3>
+            <p class="camera-description">{{ camera.description }}</p>
+        </a>
+        {% endfor %}
+    </section>
+
+    <!-- Кнопки -->
+    <div class="buttons-container">
+        <!-- Кнопка «назад» возвращает на предыдущую страницу в истории браузера -->
+        <button class="btn-action" onclick="history.back()">назад</button>
+        <button class="btn-action">редактировать</button>
+        <button class="btn-action">сохранить</button>
+    </div>
+</main>
+
+</body>
+</html>

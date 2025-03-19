@@ -1,0 +1,100 @@
+/* Сброс базовых отступов и шрифтов */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    color: #000000;
+    background-color: #FFFFFF;
+}
+
+/* Шапка */
+.header {
+    display: flex;
+    justify-content: flex-end; /* Кнопка справа */
+    align-items: center;
+    padding: 20px;
+}
+
+/* Кнопка входа для рабочего профиля */
+.btn-profile {
+    background-color: #000000; /* Черный фон */
+    color: #FFFFFF;            /* Белый текст */
+    border: none;
+    border-radius: 5px;        /* Скругленные углы */
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+.btn-profile:hover {
+    background-color: #333333; /* Эффект при наведении */
+}
+
+/* Основная часть */
+main {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto; /* Центрируем содержимое */
+    padding: 20px;
+}
+
+/* Секция поиска */
+.search-section {
+    /* Центрируем сам блок по горизонтали */
+    margin: 50px auto;
+    /* Задаём фиксированную ширину для блока */
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Внутри блока элементы остаются слева */
+}
+
+.search-label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.search-input {
+    width: 100%;            /* Ширина на всю доступную ширину родителя */
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;    /* Небольшой отступ перед кнопкой */
+    border-radius: 5px;     /* Скругленные углы у поля ввода */
+}
+
+.btn-search {
+    width: 100%;            /* Ширина на всю доступную ширину родителя */
+    background-color: #000000;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 5px;     /* Скругленные углы */
+    padding: 10px 0;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+.btn-search:hover {
+    background-color: #333333;
+}
+
+.btn-profile {
+    /* Ваши существующие стили для кнопки */
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #000;
+    color: white;
+    text-decoration: none; /* Убираем подчеркивание */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-profile:hover {
+    background-color: #333;
+}

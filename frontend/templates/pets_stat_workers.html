@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Животное N</title>
+  <!-- Подключаем свой файл стилей -->
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='pets_stat_workers.css') }}"
+>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Заголовок с названием животного -->
+    <h1 class="animal-title">{{ animal_name }}</h1>
+
+    <div class="main-content">
+      <!-- Блок со статистикой -->
+      <div class="stats">
+        {% for stat in stats %}
+          <p>{{ stat }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Блок с фото животного -->
+      <div class="animal-photo">
+        <img src="{{ animal_photo_url }}" alt="Фото животного">
+      </div>
+    </div>
+
+    <!-- Кнопки управления -->
+    <div class="buttons">
+      <button type="button" class="btn-back">назад</button>
+      <button type="button" class="btn-edit">редактировать</button>
+      <button type="button" class="btn-save">сохранить</button>
+    </div>
+  </div>
+
+</body>
+</html>

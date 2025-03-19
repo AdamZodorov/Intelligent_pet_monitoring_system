@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Информация по приюту</title>
+    <!-- Подключаем файл стилей -->
+    <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='stat_and_video_workers.css') }}"
+>
+
+</head>
+<body>
+
+<main class="shelter-info-main">
+    <h1 class="page-title">Информация по приюту</h1>
+
+    <!-- Секция со списком животных (в несколько колонок) -->
+    <section class="animals-list-container">
+        {% for animal in animals %}
+        <!-- Каждое животное — кликабельная ссылка на детальную страницу -->
+        <a href="{{ url_for('animal_detail', animal_id=animal.id) }}" class="animal-item">
+            <h3 class="animal-name">{{ animal.name }}</h3>
+            <p class="animal-stats">{{ animal.description }}</p>
+        </a>
+        {% endfor %}
+    </section>
+
+    <!-- Кнопки управления -->
+    <div class="buttons-container">
+        <button class="btn-action" type="button">просмотр видеокамер</button>
+        <button class="btn-action" type="button">редактирование камер</button>
+        <button class="btn-action" type="button">редактирование животных</button>
+    </div>
+</main>
+
+</body>
+</html>

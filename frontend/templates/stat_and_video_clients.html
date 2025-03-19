@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Информация по приюту</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='stat_and_video_clients.css') }}">
+</head>
+<body>
+    <main class="shelter-info-main">
+        <h1 class="page-title">Информация по приюту</h1>
+        <!-- Вывод ID приюта -->
+        <p class="shelter-id">ID приюта: {{ shelter_id }}</p>
+
+        <!-- Секция со списком животных -->
+        <section class="animals-list-container">
+            {% for animal in animals %}
+            <!-- Оборачиваем всю карточку животного в ссылку -->
+            <a href="{{ url_for('pets_stat_users', animal_id=animal.id) }}" class="animal-item">
+                <h3 class="animal-name">{{ animal.name }}</h3>
+                <p class="animal-stats">{{ animal.description }}</p>
+            </a>
+            {% endfor %}
+        </section>
+
+    </main>
+</body>
+</html>

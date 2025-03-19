@@ -1,0 +1,89 @@
+/* Сброс базовых отступов и шрифтов */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #FFFFFF;
+    color: #000000;
+}
+
+/* Основной контейнер страницы */
+.shelter-info-main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Заголовок */
+.page-title {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Контейнер для списка животных.
+   Используем CSS Grid для расположения в несколько колонок. */
+.animals-list-container {
+    display: grid;
+    /* Указываем минимальную ширину карточки и динамически подстраиваемся под экран */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px; /* Расстояние между элементами */
+    margin-bottom: 30px;
+    /* Если хотите ограничить высоту и добавить скролл:
+       max-height: 500px;
+       overflow-y: auto;
+    */
+}
+
+/* Каждый элемент животного (ссылка) */
+.animal-item {
+    display: block;
+    text-decoration: none;
+    color: #000000;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    transition: background-color 0.2s;
+}
+
+.animal-item:hover {
+    background-color: #f9f9f9;
+}
+
+.animal-name {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.animal-stats {
+    font-size: 14px;
+    color: #666666;
+}
+
+/* Контейнер для кнопок внизу */
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Общий стиль для кнопок */
+.btn-action {
+    background-color: #000000;
+    color: #FFFFFF;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-action:hover {
+    background-color: #333333;
+}

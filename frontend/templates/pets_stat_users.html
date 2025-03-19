@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ animal_name }}</title>
+  <!-- Подключение вашего CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='pets_stat_users.css') }}">
+</head>
+<body>
+  <div class="container">
+    <!-- Заголовок -->
+    <h1 class="animal-title">{{ animal_name }}</h1>
+
+    <!-- Основной блок: статистика + фото -->
+    <div class="main-content">
+      <div class="stats">
+        {% for stat in stats %}
+          <p>{{ stat }}</p>
+        {% endfor %}
+      </div>
+      <div class="animal-photo">
+        <img src="{{ animal_photo_url }}" alt="Фото животного">
+      </div>
+    </div>
+  </div>
+</body>
+</html>
