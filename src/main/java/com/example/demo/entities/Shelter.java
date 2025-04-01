@@ -5,8 +5,6 @@ import lombok.Data;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.UUID;
-
 
 
 @Entity
@@ -20,20 +18,31 @@ public class Shelter {
     long id;
 
     @OneToMany(mappedBy = "shelter")
-    List<Pet> pet;
+    List<Pet> pets;
 
     @OneToMany(mappedBy = "shelter")
-    List<Camera> camera;
+    List<PetGroup> groups;
 
     String name;
 
-    String shelter_login;
+    String shelterLogin;
 
-    String shelter_password;
+    String shelterPassword;
 
     String email;
 
-    Date create_dt;
+    String description;
 
+    Date createDt;
 
+    public Shelter() {
+    }
+
+    public Shelter(String name, String shelterLogin, String shelterPassword, String email) {
+        this.name = name;
+        this.shelterLogin = shelterLogin;
+        this.shelterPassword = shelterPassword;
+        this.createDt = new Date(System.currentTimeMillis());
+        this.email = email;
+    }
 }

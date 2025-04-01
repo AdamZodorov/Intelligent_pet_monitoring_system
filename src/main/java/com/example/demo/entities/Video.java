@@ -3,7 +3,8 @@ package com.example.demo.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.sql.Date;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -14,18 +15,17 @@ public class Video {
     @Column(name = "id")
     long id;
 
-    @OneToOne(mappedBy = "video")
-    BasicActivity basicActivity;
-
-    @OneToOne(mappedBy = "video")
-    Event event;
+    @OneToMany(mappedBy = "video")
+    List<BasicActivity> basicActivity;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    Camera camera;
+    PetGroup group;
 
     String filePath;
 
-    Date start_time;
+    LocalDateTime startTime;
 
-    Date end_time;
+    LocalDateTime endTime;
+
+    boolean isProcessed;
 }

@@ -1,4 +1,4 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
-*.pyth filter=lfs diff=lfs merge=lfs -text
-*.pth filter=lfs diff=lfs merge=lfs -text
+models/qw1/logs/slowfast/checkpoints/checkpoint_epoch_00200.pyth filter=lfs diff=lfs merge=lfs -text
+models/reID/logs/mpdd/ViT-B-16_30.pth filter=lfs diff=lfs merge=lfs -text

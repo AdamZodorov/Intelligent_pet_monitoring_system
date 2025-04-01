@@ -59,7 +59,7 @@ def make_dataloader(cfg):
         ])
 
     val_transforms = T.Compose([
-        T.Resize(cfg.INPUT.SIZE_TEST),
+        T.Resize((256,128), interpolation=3),
         T.ToTensor(),
         T.Normalize(mean=cfg.INPUT.PIXEL_MEAN, std=cfg.INPUT.PIXEL_STD)
     ])

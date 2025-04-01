@@ -165,15 +165,38 @@ class build_transformer(nn.Module):
         extension = trained_path.split(".")[-1]
         if extension == "pth":
             param_dict = torch.load(trained_path)
-            print(param_dict)
-            for i in param_dict:
-                self.state_dict()[i.replace('module.', '')].copy_(param_dict[i])
-        
+            
+            # Собираем сюда отфильтрованные веса
+            param_dict_filtered = {}
+            
+            for k, v in param_dict.items():
+                # В исходном коде у вас k иногда начинается с "module."
+                # Убираем это префиксное "module.":
+                key_in_model = k.replace('module.', '')
+                
+                # Проверяем, есть ли такой ключ в вашей модели
+                if key_in_model in self.state_dict():
+                    # Сверяем размерности тензоров
+                    if self.state_dict()[key_in_model].shape == v.shape:
+                        param_dict_filtered[key_in_model] = v
+                    else:
+                        print(f"[load_param] Skip loading {k}: shape mismatch "
+                            f"{v.shape} vs {self.state_dict()[key_in_model].shape}")
+                else:
+                    print(f"[load_param] Skip loading {k}: not in current model")
+            
+            # Теперь копируем только совместимые слои
+            for k, v in param_dict_filtered.items():
+                self.state_dict()[k].copy_(v)
+            
+            print(f'Loading pretrained model from {trained_path} with partial matching.')
+
         else:
+            # Если не .pth, а например .pt или другой формат - исходная логика
             param_dict = torch.jit.load(trained_path)
             print(param_dict)
-            
-        print('Loading pretrained model from {}'.format(trained_path))
+            print('Loading pretrained model from {}'.format(trained_path))
+
 
     def load_param_finetune(self, model_path):
         param_dict = torch.load(model_path)

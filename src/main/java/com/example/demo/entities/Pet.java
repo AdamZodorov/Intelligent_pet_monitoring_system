@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Date;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Data
@@ -21,34 +20,25 @@ public class Pet {
     @ManyToOne(fetch = FetchType.EAGER)
     Shelter shelter;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    Breed breed;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    Species species;
-
     @OneToMany(mappedBy = "pet")
-    List<BasicActivity> basicActivity;
+    List<BasicActivity> basicActivities;
 
-    @ManyToMany(mappedBy = "pets")
-    List<Event> events;
+    @ManyToOne(fetch = FetchType.EAGER)
+    PetGroup group;
 
     String name;
 
     int age;
 
-    String health_info;
+    double weight;
 
-    String photo_url;
+    double height;
 
-    Date create_dt;
+    String description;
 
-    public Pet(String name, int age, String health_info, String photo_url, Date create_dt) {
-        this.name = name;
-        this.age = age;
-        this.health_info = health_info;
-        this.photo_url = photo_url;
-        this.create_dt = create_dt;
-    }
+    String breed;
 
+    String species;
+
+    LocalDateTime createDt;
 }

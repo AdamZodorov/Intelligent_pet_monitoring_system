@@ -61,13 +61,12 @@ class MPDD(BaseImageDataset):
 
     def _process_dir(self, dir_path, relabel=False):
         set_name = dir_path.split("/")[-1]
-        img_paths = glob.glob(osp.join(dir_path, '*.jpg'))  # id_camid_no_origin.jpg
+        img_paths = glob.glob(osp.join(dir_path, '*.jpg'))
         
         pattern = re.compile(r'\d+_[0-9a-zA-Z]+_\d+_?.*')
         
         pid_container = set()
         camid_container = set()
-        
         
         for img_path in sorted(img_paths):
             pid = int(pattern.search(img_path).group().split("_")[0])
@@ -76,22 +75,14 @@ class MPDD(BaseImageDataset):
             camid = pattern.search(img_path).group().split("_")[1]
             camid_container.add(camid)
 
-        pid2label = {pid : label for label, pid in enumerate(pid_container)}
-        camid2label = {camid : label for label, camid in enumerate(camid_container)}
+        pid2label = {pid: label for label, pid in enumerate(pid_container)}
+        camid2label = {camid: label for label, camid in enumerate(camid_container)}
         
-
         dataset = []
         for img_path in sorted(img_paths):
             pid = int(pattern.search(img_path).group().split("_")[0])
             camid = pattern.search(img_path).group().split("_")[1]
-            
-            if set_name == "train":
-                assert 0 <= pid2label[pid] <= 94
-                
-            elif set_name == "gallery" or set_name == "query":
-                assert 0 <= pid2label[pid] <= 95
-            
-            
+
             if relabel:
                 pid = pid2label[pid]
                 

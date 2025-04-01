@@ -1,9 +1,11 @@
 package com.example.demo.entities;
 
+import com.example.demo.model.ActivityType;
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -17,20 +19,12 @@ public class BasicActivity {
     @ManyToOne(fetch = FetchType.EAGER)
     Pet pet;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     Video video;
 
-    Type type;
+    ActivityType activityType;
 
-    Date start_time;
+    long startTimeInSeconds;
 
-    Date end_time;
-
-    boolean has_video;
-
-
-}
-
-enum Type {
-
+    long endTimeInSeconds;
 }

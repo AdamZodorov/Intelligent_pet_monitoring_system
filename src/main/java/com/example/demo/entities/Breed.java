@@ -5,17 +5,14 @@ import lombok.Data;
 
 import java.util.List;
 
-@Entity
-@Data
-@Table(name = "Breeds")
-public class Breed {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    long id;
-
-    @OneToMany(mappedBy = "breed")
-    List<Pet> pet;
-
-    String breed;
-}
+//@Entity
+//@Data
+//@Table(name = "Breeds")
+//public class Breed {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(name = "id")
+//    long id;
+//
+//    String breed;
+//}

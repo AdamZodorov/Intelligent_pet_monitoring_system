@@ -1,0 +1,15 @@
+{
+  "Keeping still": 0,
+  "Walking": 1,
+  "Eating": 2,
+  "Moving": 3,
+  "Running": 4,
+  "Drinking": 5,
+  "Attacking": 6,
+  "Fighting": 7,
+  "Displaying Defensive Pose": 8,
+  "Standing": 9,
+  "Sitting": 10,
+  "Resting": 11,
+  "Lying Down": 12
+}
