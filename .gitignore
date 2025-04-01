@@ -34,3 +34,5 @@ build/
 
 go/
 frontend/__pycache__
+key
+key.pub
