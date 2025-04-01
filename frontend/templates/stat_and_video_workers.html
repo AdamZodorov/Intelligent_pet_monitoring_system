@@ -1,38 +1,88 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8" />
-    <title>Информация по приюту</title>
-    <!-- Подключаем файл стилей -->
+  <head>
     <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='stat_and_video_workers.css') }}"
->
+      rel="icon"
+      href="{{ url_for('static', filename='photo/image.png') }}"
+    />
+    <meta charset="UTF-8" />
+    <title>Информация о приюте</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='stat_and_video_workers.css') }}"
+    />
+  </head>
+  <body>
+    <main class="shelter-info-main">
+      <div class="header-wrapper">
+        <div class="header-info">
+          <h1 class="page-title">{{ shelter.name }}</h1>
+          <!-- <p class="shelter-id">ID приюта: {{ shelter.id }}</p> -->
+          {% if shelter.description %}
+          <p class="shelter-description">{{ shelter.description }}</p>
+          {% endif %}
+        </div>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Выйти</a>
+      </div>
+      {% if error %}
+      <div id="serverError">{{ error }}</div>
+      {% endif %}
 
-</head>
-<body>
-
-<main class="shelter-info-main">
-    <h1 class="page-title">Информация по приюту</h1>
-
-    <!-- Секция со списком животных (в несколько колонок) -->
-    <section class="animals-list-container">
+      <section class="animals-grid">
         {% for animal in animals %}
-        <!-- Каждое животное — кликабельная ссылка на детальную страницу -->
-        <a href="{{ url_for('animal_detail', animal_id=animal.id) }}" class="animal-item">
+        <a
+          href="{{ url_for('pets_stat_workers', animal_id=animal.id) }}"
+          class="animal-card"
+        >
+          {% if animal.photos and animal.photos|length > 0 %}
+          <img
+            src="{{ url_for('get_pet_photo', pet_id=animal.id) }}"
+            alt="{{ animal.name }}"
+            class="animal-image"
+          />
+          {% else %}
+          <img
+            src="{{ url_for('static', filename='photo/dog.jpg') }}"
+            alt="{{ animal.name }}"
+            class="animal-image"
+          />
+          {% endif %}
+          <div class="animal-info">
             <h3 class="animal-name">{{ animal.name }}</h3>
-            <p class="animal-stats">{{ animal.description }}</p>
+
+            <div class="animal-meta">
+              <span class="animal-type">
+                <span class="icon"></span>
+                {{ animal.species }}
+              </span>
+              <span class="animal-age">
+                <span class="icon"></span>
+                {{ animal.age }} {{ animal.age | russian_years }}
+              </span>
+              <span class="animal-breed">
+                <span class="icon"></span>
+                {{ animal.breed }}
+              </span>
+            </div>
+          </div>
         </a>
         {% endfor %}
-    </section>
+      </section>
 
-    <!-- Кнопки управления -->
-    <div class="buttons-container">
-        <button class="btn-action" type="button">просмотр видеокамер</button>
-        <button class="btn-action" type="button">редактирование камер</button>
-        <button class="btn-action" type="button">редактирование животных</button>
-    </div>
-</main>
-
-</body>
+      <div class="action-buttons-container">
+        <div class="action-buttons">
+          <a href="{{ url_for('add_animal') }}" class="action-button"
+            >Добавить животное</a
+          >
+        </div>
+      </div>
+    </main>
+    <script>
+      window.onpageshow = function (event) {
+        if (event.persisted) {
+          window.location.reload();
+        }
+      };
+    </script>
+  </body>
 </html>

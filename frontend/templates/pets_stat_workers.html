@@ -1,41 +1,224 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-  <meta charset="UTF-8">
-  <title>Животное N</title>
-  <!-- Подключаем свой файл стилей -->
-  <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='pets_stat_workers.css') }}"
->
-</head>
-<body>
+  <head>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='photo/image.png') }}"
+    />
+    <meta charset="UTF-8" />
+    <title>Страничка {{ animal.name }}a</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='pets_stat_users.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="animal-title">{{ animal.name }}</h1>
 
-  <div class="container">
-    <!-- Заголовок с названием животного -->
-    <h1 class="animal-title">{{ animal_name }}</h1>
+      <div class="main-content">
+        <div class="stats">
+          <div class="stats-grid">
+            <div class="stat-item">
+              <span class="stat-label">Вид</span>
+              <span class="stat-value">{{ animal.species }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Порода</span>
+              <span class="stat-value">{{ animal.breed }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Возраст</span>
+              <span class="stat-value">{{ animal.age }} {{ animal.age | russian_years }} </span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Вес</span>
+              <span class="stat-value">{{ animal.weight }} кг</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">Рост</span>
+              <span class="stat-value">{{ animal.height }} м</span>
+            </div>
+          </div>
+          <div class="animal-description">{{ animal.description }}</div>
+        </div>
 
-    <div class="main-content">
-      <!-- Блок со статистикой -->
-      <div class="stats">
-        {% for stat in stats %}
-          <p>{{ stat }}</p>
-        {% endfor %}
+        <div class="animal-photo">
+          <img src="{{ animal_photo_url }}" alt="Фото животного" />
+        </div>
       </div>
-
-      <!-- Блок с фото животного -->
-      <div class="animal-photo">
-        <img src="{{ animal_photo_url }}" alt="Фото животного">
+      <div class="buttons-container">
+        <!-- <button type="button" class="btn-edit">Редактировать данные</button> -->
+        <button type="button" class="btn-delete">Удалить данные</button>
       </div>
     </div>
 
-    <!-- Кнопки управления -->
-    <div class="buttons">
-      <button type="button" class="btn-back">назад</button>
-      <button type="button" class="btn-edit">редактировать</button>
-      <button type="button" class="btn-save">сохранить</button>
-    </div>
-  </div>
 
-</body>
+    <div class="activity-timeline">
+      <h2>Топ-3 активности питомца</h2>
+
+      {% if activity_data|length == 0 %}
+        <div class="no-activities">
+          Активностей не найдено
+        </div>
+      {% else %}
+        <div class="activity-cards">
+          {% for activity in activity_data %}
+            <div class="activity-card">
+              <div class="card-medals">
+                {% if loop.index == 1 %}
+                  <span class="medal-icons">🥇</span>
+                  <span class="card-place">Золото</span>
+                {% elif loop.index == 2 %}
+                  <span class="medal-icons">🥈</span>
+                  <span class="card-place">Серебро</span>
+                {% elif loop.index == 3 %}
+                  <span class="medal-icons">🥉</span>
+                  <span class="card-place">Бронза</span>
+                {% else %}
+                  <span class="medal-icons">🎖</span>
+                  <span class="card-place">{{ loop.index }} место</span>
+                {% endif %}
+              </div>
+              <div class="card-content">
+                <div class="card-title">
+                  {{ activity.activityType }}
+                </div>
+                <div class="card-duration">
+                  {{ activity.duration }} сек
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+
+    <div class="video-section" id="videoSection">
+      <h2>Видео активности</h2>
+      <div class="video-timings-wrapper">
+        <div class="video-container">
+          <video id="activityVideo" controls>
+            <source src="{{ video }}" />
+            Ваш браузер не поддерживает видео тег.
+          </video>
+        </div>
+        <div class="activities-container">
+          {% if grouped_activities %}
+            {% for activity_type, times in grouped_activities.items() %}
+              <div class="activity-column">
+                <h3>{{ activity_type }}</h3>
+                <ul class="time-list">
+                  {% for time in times %}
+                  <li>
+                    <button
+                      type="button"
+                      class="timing-btn"
+                      data-start="{{ time.seconds }}"
+                    >
+                      {{ time.formatted }}
+                    </button>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            {% endfor %}
+            {% else %}
+            <!-- Простой текст при отсутствии активности -->
+            <div class="empty-icon">⚠</div>
+            <p class="no-activities-text">Нет данных об активности</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <h2>Подтверждение удаления</h2>
+        <p>
+          Вы уверены, что хотите удалить данные о данном животном? Вернуть их
+          будет нельзя.
+        </p>
+        <div class="modal-buttons">
+          <button id="modalCancel" type="button">Отмена</button>
+          <form
+            action="{{ url_for('delete_animal', animal_id=animal_id) }}"
+            method="POST"
+          >
+            <button type="submit" id="modalConfirm">Да, удалить</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+      const btnDelete = document.querySelector(".btn-delete");
+      const modalOverlay = document.getElementById("modalOverlay");
+      const modalCancel = document.getElementById("modalCancel");
+
+      btnDelete.addEventListener("click", function () {
+        modalOverlay.style.display = "flex";
+      });
+
+      modalCancel.addEventListener("click", function () {
+        modalOverlay.style.display = "none";
+      });
+
+      const video = document.getElementById("activityVideo");
+      let isVideoReady = false;
+
+      video.addEventListener("loadedmetadata", () => {
+        isVideoReady = true;
+        console.log("Video duration:", video.duration);
+      });
+
+      video.addEventListener("error", () => {
+        console.error("Error loading video:", video.error);
+      });
+
+      document.querySelectorAll(".timing-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const startTime = parseInt(btn.dataset.start);
+          console.log("Attempting to seek to:", startTime);
+
+          const seekAndPlay = () => {
+            if (video.readyState > 0) {
+              video.currentTime = startTime;
+              video.play().catch((error) => {
+                console.error("Playback failed:", error);
+              });
+              return true;
+            }
+            return false;
+          };
+
+          if (!seekAndPlay()) {
+            const waitForReady = setInterval(() => {
+              if (seekAndPlay()) {
+                clearInterval(waitForReady);
+              }
+            }, 100);
+          }
+
+          document.getElementById("videoSection").scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        });
+      });
+
+      video.controls = true;
+      video.preload = "metadata";
+
+      video.addEventListener("timeupdate", () => {
+        console.debug("Current time:", video.currentTime);
+      });
+
+      video.addEventListener("seeked", () => {
+        console.log("Seek completed");
+      });
+    </script>
+  </body>
 </html>

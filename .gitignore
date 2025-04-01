@@ -34,5 +34,8 @@ build/
 
 go/
 frontend/__pycache__
+.env
 key
 key.pub
+settings.json
+/frontend_temp

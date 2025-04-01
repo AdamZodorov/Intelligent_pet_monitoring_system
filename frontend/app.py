@@ -1,339 +1,562 @@
-from flask import Flask, render_template, request, url_for
+from flask import Response, Flask, render_template, request, url_for, redirect, session
+from functools import wraps
+import requests
+from dotenv import load_dotenv
+import os
+import json
+import logging
+import sys
+
+
 
 app = Flask(
     __name__,
-    template_folder="templates",  # путь к папке с HTML
-    static_folder="static"        # путь к папке со статикой (CSS/JS)
+    template_folder="templates",
+    static_folder="static"
 )
 
-# Главная страница
-@app.route("/")
-def main_page():
-    return render_template("main_page.html")
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+
+logging.basicConfig(
+    stream=sys.stdout,
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE='Lax'
+)
 
 
-# Аутентификация для работников
-@app.route("/auth_for_workers")
-def auth_for_workers():
-    return render_template("auth_for_workers.html")
+load_dotenv()
+app.secret_key = os.environ['FLASK_SECRET_KEY']
+base_url = "http://localhost:8080"
 
-
-# Статистика камеры для работников
-@app.route("/camera_stat_workers")
-def camera_stat_workers():
-    return render_template("camera_stat_workers.html")
-
-
-# Камеры работников
-@app.route("/cameras_workers")
-def cameras_workers():
-    return render_template("cameras_workers.html")
-
-
-# Статистика питомцев для пользователей с информацией из stat_and_video_clients
-@app.route("/pets_stat_users")
-def pets_stat_users():
-    # Получаем параметр animal_id из GET-запроса (например, /pets_stat_users?animal_id=1)
-    animal_id = request.args.get("animal_id", type=int)
-
-    # Словарь с данными о животных
-    shelters_animals = {
-        1: {"id": 1, "name": "Барсик", "description": "Кот, 2 года"},
-        2: {"id": 2, "name": "Мурзик", "description": "Кот, 1 год"},
-        3: {"id": 3, "name": "Рыжик", "description": "Кот, 3 года"},
-        4: {"id": 4, "name": "Снежок", "description": "Кот, 5 лет"},
-        5: {"id": 5, "name": "Грей", "description": "Кот, 4 года"},
-        6: {"id": 6, "name": "Шарик", "description": "Пёс, 4 года"},
-        7: {"id": 7, "name": "Мурка", "description": "Кошка, 1 год"},
-        8: {"id": 8, "name": "Снежка", "description": "Кошка, 2 года"},
-        9: {"id": 9, "name": "Луна", "description": "Кошка, 3 года"},
-        10: {"id": 10, "name": "Карамелька", "description": "Кошка, 1.5 года"},
-        11: {"id": 11, "name": "Соня", "description": "Кошка, 4 года"},
-        12: {"id": 12, "name": "Буся", "description": "Кошка, 6 лет"},
-        13: {"id": 13, "name": "Рекс", "description": "Собака, 6 лет"},
-        14: {"id": 14, "name": "Джек", "description": "Собака, 3 года"},
-        15: {"id": 15, "name": "Тигра", "description": "Кот, 2 года"},
-        16: {"id": 16, "name": "Лео", "description": "Кот, 1 год"},
-        17: {"id": 17, "name": "Симба", "description": "Кот, 3 года"},
-        18: {"id": 18, "name": "Барон", "description": "Кот, 4 года"},
-        19: {"id": 19, "name": "Честер", "description": "Кот, 5 лет"},
-        20: {"id": 20, "name": "Гарри", "description": "Кот, 2.5 года"},
-        21: {"id": 21, "name": "Ричард", "description": "Кот, 6 лет"},
-        22: {"id": 22, "name": "Феликс", "description": "Кот, 3.5 года"},
-        23: {"id": 23, "name": "Байрон", "description": "Кот, 2 года"},
-        24: {"id": 24, "name": "Оскар", "description": "Кот, 7 лет"},
-        25: {"id": 25, "name": "Белка", "description": "Собака, 2 года"},
-        26: {"id": 26, "name": "Стрелка", "description": "Собака, 3 года"},
-        27: {"id": 27, "name": "Лайка", "description": "Собака, 4 года"},
-        28: {"id": 28, "name": "Тузик", "description": "Собака, 5 лет"},
-        29: {"id": 29, "name": "Гром", "description": "Собака, 3 года"},
-        30: {"id": 30, "name": "Васька", "description": "Кот, 1 год"},
-        31: {"id": 31, "name": "Пушок", "description": "Кот, 2 года"},
-        32: {"id": 32, "name": "Черныш", "description": "Кот, 3 года"},
-        33: {"id": 33, "name": "Рыжуля", "description": "Кот, 4 года"},
-        34: {"id": 34, "name": "Дружок", "description": "Пёс, 5 лет"},
-        35: {"id": 35, "name": "Бим", "description": "Пёс, 2 года"},
-        36: {"id": 36, "name": "Зефир", "description": "Кошка, 1 год"},
-        37: {"id": 37, "name": "Маркиз", "description": "Кошка, 2 года"},
-        38: {"id": 38, "name": "Соня", "description": "Кошка, 3 года"},
-        39: {"id": 39, "name": "Буся", "description": "Кошка, 4 года"},
-        40: {"id": 40, "name": "Глория", "description": "Кошка, 5 лет"},
-        41: {"id": 41, "name": "Тиффани", "description": "Кошка, 6 лет"},
-        42: {"id": 42, "name": "Лейла", "description": "Кошка, 7 лет"},
-        43: {"id": 43, "name": "Рокки", "description": "Собака, 6 лет"},
-        44: {"id": 44, "name": "Дейзи", "description": "Собака, 3 года"},
-        45: {"id": 45, "name": "Макс", "description": "Собака, 4 года"},
-        46: {"id": 46, "name": "Сэм", "description": "Собака, 5 лет"},
-        47: {"id": 47, "name": "Бадди", "description": "Собака, 6 лет"},
-        48: {"id": 48, "name": "Ральф", "description": "Собака, 7 лет"},
-        49: {"id": 49, "name": "Чарли", "description": "Собака, 8 лет"},
-        50: {"id": 50, "name": "Оскар", "description": "Собака, 2 года"},
-        51: {"id": 51, "name": "Лаки", "description": "Собака, 3.5 года"},
-        52: {"id": 52, "name": "Шон", "description": "Собака, 9 лет"},
-        53: {"id": 53, "name": "Гарфилд", "description": "Кот, 2 года"},
-        54: {"id": 54, "name": "Том", "description": "Кот, 1 год"},
-        55: {"id": 55, "name": "Белла", "description": "Собака, 2 года"},
-        56: {"id": 56, "name": "Луна", "description": "Собака, 3 года"},
-        57: {"id": 57, "name": "Чарли", "description": "Собака, 4 года"},
-        58: {"id": 58, "name": "Тедди", "description": "Собака, 5 лет"},
-        59: {"id": 59, "name": "Кай", "description": "Собака, 6 лет"},
-        60: {"id": 60, "name": "Райли", "description": "Собака, 7 лет"}
-    }
-
-    # Если animal_id не передан или его нет в словаре, возвращаем ошибку
-    if animal_id is None or animal_id not in shelters_animals:
-        return "Животное не найдено", 404
-
-    animal_name = shelters_animals[animal_id]["name"]
-    # Преобразуем описание в список, чтобы цикл в шаблоне отработал корректно
-    stats = [shelters_animals[animal_id]["description"]]
-    # URL фотографии; если фото нет, используем изображение по умолчанию
-    if "Кот" in shelters_animals[animal_id]["description"] or "Кошка" in shelters_animals[animal_id]["description"]:
-        animal_photo_url = url_for('static', filename='cat.jpg')
-    else:
-        animal_photo_url = url_for('static', filename='dog.jpg')
-
-    return render_template(
-        "pets_stat_users.html",
-        animal_name=animal_name,
-        stats=stats,
-        animal_photo_url=animal_photo_url
-    )
-
-
-
-
-# Статистика питомцев для работников
-@app.route("/pets_stat_workers")
-def pets_stat_workers():
-    return render_template("pets_stat_workers.html")
-
-
-# Питомцы работников
-@app.route("/pets_workers")
-def pets_workers():
-    return render_template("pets_workers.html")
-
-
-# Поиск клиентов – заглушка для API-запросов
-@app.route("/search_for_clients", methods=["GET"])
-def search_for_clients():
-    # Параметр запроса из формы
-    query = request.args.get("query", "")
-
-    # Заглушка: список приютов
-    shelters = [
+API_EXAMPLES = {
+    "shelters": [
         {
             "id": 1,
-            "name": "Приют 1",
-            "address": "Покровская, 1",
-            "link": "https://www.mos.ru/city/projects/pets/priyut/"
+            "name": "Приют 'Лапки'",
+            "description": "Приют для кошек и собак в центре города",
+            "website": "https://lapki-shelter.ru"
         },
         {
             "id": 2,
-            "name": "Приют 2",
-            "address": "Троицкая, 5",
-            "link": "https://vao-priut.org/"
-        },
-        {
-            "id": 3,
-            "name": "Приют 3",
-            "address": "Новослободская, 3",
-            "link": "https://priut-kozhuhovo.com/"
-        },
-        {
-            "id": 4,
-            "name": "Приют 4",
-            "address": "Тереньевская, 14",
-            "link": "https://yandex.ru/maps/213/moscow/category/animal_shelter/16058225738/"
-        },
-        {
-            "id": 5,
-            "name": "Приют 5",
-            "address": "Ленинский пр-т, 10",
-            "link": "https://kotodommurlyka.ru/"
-        },
-        {
-            "id": 6,
-            "name": "Приют 6",
-            "address": "ул. Пушкина, 25",
-            "link": "https://murkosha.ru/?utm_source=google&utm_medium=maps&utm_campaign=company_card&utm_content=site"
-        },
-        {
-            "id": 7,
-            "name": "Приют 7",
-            "address": "пр. Мира, 15",
-            "link": "http://vao-priut.org/links/munitsipalnyi-priyut-dlya-bezdomnykh-zhivotnykh-khimki"
-        },
-        {
-            "id": 8,
-            "name": "Приют 8",
-            "address": "ул. Гагарина, 7",
-            "link": "https://izpriuta.ru/"
-        },
-        {
-            "id": 9,
-            "name": "Приют 9",
-            "address": "ул. Солнечная, 42",
-            "link": "https://suncats.ru/"
-        },
-        {
-            "id": 10,
-            "name": "Приют 10",
-            "address": "пр. Космонавтов, 8",
-            "link": "https://spacepaws.org/"
-        },
-        {
-            "id": 11,
-            "name": "Приют 11",
-            "address": "ул. Лесная, 15А",
-            "link": "https://forestfriends.ru/"
-        },
-        {
-            "id": 12,
-            "name": "Приют 12",
-            "address": "пер. Цветочный, 3",
-            "link": "https://flowerpets.com/"
+            "name": "Дом для хвостов",
+            "description": "Специализированный приют для собак",
+            "website": "https://hvosty.org"
         }
-    ]
-    return render_template(
-        "search_for_clients.html",
-        query=query,
-        shelters=shelters
-    )
-
-
-# Статистика и видео клиентов
-@app.route("/stat_and_video_clients")
-def stat_and_video_clients():
-    # Получаем id приюта, переданный через GET-параметр
-    shelter_id = request.args.get("shelter_id")
-
-    # Преобразуем shelter_id в целое число (если нужно) и добавляем проверку
-    try:
-        shelter_id = int(shelter_id)
-    except (TypeError, ValueError):
-        shelter_id = None
-
-    # Заглушка: список животных, можно фильтровать по shelter_id при необходимости
-    shelters_animals = shelters_animals = {
-    1: [
-        {"id": 1, "name": "Барсик", "description": "Кот, 2 года"},
-        {"id": 2, "name": "Мурзик", "description": "Кот, 1 год"},
-        {"id": 3, "name": "Рыжик", "description": "Кот, 3 года"},
-        {"id": 4, "name": "Снежок", "description": "Кот, 5 лет"},
-        {"id": 5, "name": "Грей", "description": "Кот, 4 года"}
     ],
-    2: [
-        {"id": 6, "name": "Шарик", "description": "Пёс, 4 года"}
+    "shelter_pets": [
+        {
+            "id": 1,
+            "name": "Барсик",
+            "species": "Кот",
+            "age": 2,
+            "weight": 4.2,
+            "height": 25.0,
+            "breed": "Дворовый",
+            "description": "Игривый и ласковый кот"
+        },
+        {
+            "id": 2,
+            "name": "Шарик",
+            "species": "Собака",
+            "age": 4,
+            "weight": 12.5,
+            "height": 45.0,
+            "breed": "Дворняжка",
+            "description": "Дружелюбный и активный пёс"
+        }
     ],
-    3: [
-        {"id": 7, "name": "Мурка", "description": "Кошка, 1 год"},
-        {"id": 8, "name": "Снежка", "description": "Кошка, 2 года"},
-        {"id": 9, "name": "Луна", "description": "Кошка, 3 года"},
-        {"id": 10, "name": "Карамелька", "description": "Кошка, 1.5 года"},
-        {"id": 11, "name": "Соня", "description": "Кошка, 4 года"},
-        {"id": 12, "name": "Буся", "description": "Кошка, 6 лет"}
-    ],
-    4: [
-        {"id": 13, "name": "Рекс", "description": "Собака, 6 лет"},
-        {"id": 14, "name": "Джек", "description": "Собака, 3 года"}
-    ],
-    5: [
-        {"id": 15, "name": "Тигра", "description": "Кот, 2 года"},
-        {"id": 16, "name": "Лео", "description": "Кот, 1 год"},
-        {"id": 17, "name": "Симба", "description": "Кот, 3 года"},
-        {"id": 18, "name": "Барон", "description": "Кот, 4 года"},
-        {"id": 19, "name": "Честер", "description": "Кот, 5 лет"},
-        {"id": 20, "name": "Гарри", "description": "Кот, 2.5 года"},
-        {"id": 21, "name": "Ричард", "description": "Кот, 6 лет"},
-        {"id": 22, "name": "Феликс", "description": "Кот, 3.5 года"},
-        {"id": 23, "name": "Байрон", "description": "Кот, 2 года"},
-        {"id": 24, "name": "Оскар", "description": "Кот, 7 лет"}
-    ],
-    6: [
-        {"id": 25, "name": "Белка", "description": "Собака, 2 года"},
-        {"id": 26, "name": "Стрелка", "description": "Собака, 3 года"},
-        {"id": 27, "name": "Лайка", "description": "Собака, 4 года"},
-        {"id": 28, "name": "Тузик", "description": "Собака, 5 лет"},
-        {"id": 29, "name": "Гром", "description": "Собака, 3 года"}
-    ],
-    7: [
-        {"id": 30, "name": "Васька", "description": "Кот, 1 год"},
-        {"id": 31, "name": "Пушок", "description": "Кот, 2 года"},
-        {"id": 32, "name": "Черныш", "description": "Кот, 3 года"},
-        {"id": 33, "name": "Рыжуля", "description": "Кот, 4 года"}
-    ],
-    8: [
-        {"id": 34, "name": "Дружок", "description": "Пёс, 5 лет"},
-        {"id": 35, "name": "Бим", "description": "Пёс, 2 года"}
-    ],
-    9: [
-        {"id": 36, "name": "Зефир", "description": "Кошка, 1 год"},
-        {"id": 37, "name": "Маркиз", "description": "Кошка, 2 года"},
-        {"id": 38, "name": "Соня", "description": "Кошка, 3 года"},
-        {"id": 39, "name": "Буся", "description": "Кошка, 4 года"},
-        {"id": 40, "name": "Глория", "description": "Кошка, 5 лет"},
-        {"id": 41, "name": "Тиффани", "description": "Кошка, 6 лет"},
-        {"id": 42, "name": "Лейла", "description": "Кошка, 7 лет"}
-    ],
-    10: [
-        {"id": 43, "name": "Рокки", "description": "Собака, 6 лет"},
-        {"id": 44, "name": "Дейзи", "description": "Собака, 3 года"},
-        {"id": 45, "name": "Макс", "description": "Собака, 4 года"},
-        {"id": 46, "name": "Сэм", "description": "Собака, 5 лет"},
-        {"id": 47, "name": "Бадди", "description": "Собака, 6 лет"},
-        {"id": 48, "name": "Ральф", "description": "Собака, 7 лет"},
-        {"id": 49, "name": "Чарли", "description": "Собака, 8 лет"},
-        {"id": 50, "name": "Оскар", "description": "Собака, 2 года"},
-        {"id": 51, "name": "Лаки", "description": "Собака, 3.5 года"},
-        {"id": 52, "name": "Шон", "description": "Собака, 9 лет"}
-    ],
-    11: [
-        {"id": 53, "name": "Гарфилд", "description": "Кот, 2 года"},
-        {"id": 54, "name": "Том", "description": "Кот, 1 год"}
-    ],
-    12: [
-        {"id": 55, "name": "Белла", "description": "Собака, 2 года"},
-        {"id": 56, "name": "Луна", "description": "Собака, 3 года"},
-        {"id": 57, "name": "Чарли", "description": "Собака, 4 года"},
-        {"id": 58, "name": "Тедди", "description": "Собака, 5 лет"},
-        {"id": 59, "name": "Кай", "description": "Собака, 6 лет"},
-        {"id": 60, "name": "Райли", "description": "Собака, 7 лет"}
-    ]
+    "pet_detail1": {
+        "id": 1,
+        "name": "Барсик",
+        "age": 2,
+        "weight": 4.2,
+        "height": 25.0,
+        "breed": "Дворовый",
+        "species": "Кот",
+        "description": "Игривый и ласковый кот"
+    },
+    "pet_detail2": {
+        "id": 2,
+        "name": "Шарик",
+        "species": "Собака",
+        "age": 4,
+        "weight": 12.5,
+        "height": 45.0,
+        "breed": "Дворняжка",
+        "description": "Дружелюбный и активный пёс"
+    },
+    "auth_response": {
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        "shelterId": 1
+    }
 }
 
 
-    # Здесь можно добавить логику для получения данных по shelter_id из базы или API
 
-    return render_template("stat_and_video_clients.html", animals=shelters_animals[shelter_id], shelter_id=shelter_id)
+def pluralize_years(age):
+    if age % 10 == 1 and age % 100 != 11:
+        return "год"
+    elif age % 10 in [2, 3, 4] and age % 100 not in [12, 13, 14]:
+        return "года"
+    else:
+        return "лет"
+
+app.jinja_env.filters["russian_years"] = pluralize_years
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'auth_token' not in session or 'shelter_id' not in session:
+            # app.logger.debug("🔐 Unauthorized access — session: %s", dict(session))
+            return redirect(url_for('main_page'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 
-# Статистика и видео работников
+@app.after_request
+def add_no_cache_headers(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+
+def fetch_api_data(endpoint, method='GET', data=None, files=None):
+    """Универсальная функция для запросов к API с поддержкой JWT-авторизации.
+
+    Если параметр files не None, запрос делается как multipart/form-data.
+    """
+    headers = {}
+    if 'auth_token' in session:
+        headers['Authorization'] = f'Bearer {session["auth_token"]}'
+    try:
+        if files:
+            response = requests.request(
+                method=method,
+                url=f"{base_url}{endpoint}",
+                files=files,
+                data=data,
+                headers=headers
+            )
+        else:
+            response = requests.request(
+                method=method,
+                url=f"{base_url}{endpoint}",
+                json=data,
+                headers=headers
+            )
+        app.logger.debug(f"API ответ: код={response.status_code} body={response.text[:200]}")
+        response.raise_for_status()
+        return response.json() if response.content else None
+    except requests.exceptions.HTTPError as e:
+        app.logger.debug(f"API HTTPError: {e.response.status_code} - {e.response.text}")
+        return None
+    except requests.exceptions.RequestException as e:
+        app.logger.debug(f"API RequestException: {e}")
+        return None
+
+
+@app.route("/logout")
+def logout():
+    session.clear()
+    return redirect(url_for('main_page'))
+
+
+@app.route("/")
+def main_page():
+    if 'auth_token' in session:
+        return redirect(url_for('stat_and_video_workers'))
+
+    # Пример данных
+    # shelters_data = API_EXAMPLES["shelters"]
+    # Реальный запрос:
+    shelters_data = fetch_api_data("/api/shelters") or []
+    if shelters_data == []:
+        return render_template(
+            "error.html",
+            error="Приюты не найдены ! Попробуйте еще раз...")
+    return render_template("main_page.html", shelters=shelters_data)
+
+
+@app.route("/stat_and_video_clients")
+def stat_and_video_clients():
+    try:
+        shelter_id = int(request.args.get("shelter_id"))
+    except (TypeError, ValueError):
+        return "Некорректный ID приюта", 400
+
+    # Пример данных
+    # animals_data = API_EXAMPLES["shelter_pets"]
+    # shelter_data = next((s for s in API_EXAMPLES["shelters"] if s["id"] == shelter_id), None)
+
+    # Реальные запросы:
+    animals_data = fetch_api_data(f"/api/shelters/{shelter_id}/pets") or []
+    shelter_data = fetch_api_data(f"/api/shelters/{shelter_id}")
+    # if not animals_data:
+    #     return render_template(
+    #         "error.html",
+    #         error="Данные о животных не найдены ! Попробуйте еще раз...")
+    if not shelter_data:
+        return render_template(
+            "error.html",
+            error="Данные о приюте не найдены ! Попробуйте еще раз...")
+
+    for animal in animals_data:
+        animal["photos"] = url_for('get_pet_photo', pet_id=animal["id"])
+    return render_template(
+        "stat_and_video_clients.html",
+        animals=animals_data,
+        shelter=shelter_data
+    )
+
+
 @app.route("/stat_and_video_workers")
+@login_required
 def stat_and_video_workers():
-    return render_template("stat_and_video_workers.html")
+    shelter_id = session.get("shelter_id")
+
+    # Пример данных
+    # animals_data = API_EXAMPLES["shelter_pets"]
+    # shelter_data = next((s for s in API_EXAMPLES["shelters"] if s["id"] == shelter_id), None)
+
+    # Реальные запросы:
+    animals_data = fetch_api_data(f"/api/shelters/{shelter_id}/pets") or []
+    shelter_data = fetch_api_data(f"/api/shelters/{shelter_id}") or []
+
+    # if not animals_data:
+    #     session.clear()
+    #     return render_template(
+    #         "error.html",
+    #         error="Данные о животных не найдены ! Попробуйте еще раз...")
+    if not shelter_data:
+        session.clear()
+        return render_template(
+            "error.html",
+            error="Данные о приюте не найдены ! Попробуйте еще раз...")
+
+    for animal in animals_data:
+        animal["photos"] = url_for('get_pet_photo', pet_id=animal["id"])
+
+    return render_template(
+        "stat_and_video_workers.html",
+        animals=animals_data,
+        shelter=shelter_data,
+    )
+
+
+@app.route("/pets_stat_users")
+def pets_stat_users():
+    if 'auth_token' in session:
+        return redirect(url_for('stat_and_video_workers'))
+
+    animal_id = request.args.get("animal_id", type=int)
+    if not animal_id:
+        return render_template(
+            "error.html",
+            error="Не найден ID животного ! Попробуйте еще раз...")
+
+    animal_data = fetch_api_data(f"/api/pets/{animal_id}")
+    video = url_for('get_pet_video', pet_id=animal_id)
+    if not animal_data:
+        return render_template(
+            "error.html",
+            error="Животное не найдено ! Попробуйте еще раз...")
+
+    activities = fetch_api_data(f"/api/pets/{animal_id}/activities")
+    grouped_activities = {}
+
+    if activities:
+        for item in activities:
+            activity_type = item.get("activityType", "UNKNOWN")
+            start_time_raw = item.get("startTime")
+            try:
+                formatted_time = start_time_raw
+                time = list(map(int, start_time_raw.split(":")))
+                seconds = time[0] * 3600 + time[1] * 60 + time[2]
+            except Exception as e:
+                print(f"Ошибка форматирования времени: {e}")
+                formatted_time = start_time_raw
+                seconds = 0
+
+            if activity_type not in grouped_activities:
+                grouped_activities[activity_type] = []
+            grouped_activities[activity_type].append({
+                'formatted': formatted_time,
+                'seconds': seconds
+            })
+
+    activity_data = fetch_api_data(f"/api/pets/{animal_id}/top-activities")
+    if not activity_data:
+        activity_data = []
+    else:
+        # Ограничиваем количество отображаемых активностей до 3
+        activity_data = activity_data[:3]
+
+    return render_template(
+        "pets_stat_users.html",
+        animal=animal_data,
+        animal_photo_url=url_for('get_pet_photo', pet_id=animal_id),
+        animal_id=animal_id,
+        video=video,
+        grouped_activities=grouped_activities,
+        activity_data=activity_data
+    )
+
+
+@app.route("/pets_stat_workers")
+@login_required
+def pets_stat_workers():
+    animal_id = request.args.get("animal_id", type=int)
+    if not animal_id:
+        session.clear()
+        return render_template(
+            "error.html",
+            error="Не найден ID животного ! Попробуйте еще раз...")
+
+    animal_data = fetch_api_data(f"/api/pets/{animal_id}")
+    video = url_for('get_pet_video', pet_id=animal_id)
+    if not animal_data:
+        session.clear()
+        return render_template(
+            "error.html",
+            error="Животное не найдено ! Попробуйте еще раз...")
+
+    activities = fetch_api_data(f"/api/pets/{animal_id}/activities")
+    grouped_activities = {}
+
+    if activities:
+        for item in activities:
+            activity_type = item.get("activityType", "UNKNOWN")
+            start_time_raw = item.get("startTime")
+            try:
+                formatted_time = start_time_raw
+                time = list(map(int, start_time_raw.split(":")))
+                seconds = time[0] * 3600 + time[1] * 60 + time[2]
+            except Exception as e:
+                print(f"Ошибка форматирования времени: {e}")
+                formatted_time = start_time_raw
+                seconds = 0
+
+            if activity_type not in grouped_activities:
+                grouped_activities[activity_type] = []
+            grouped_activities[activity_type].append({
+                'formatted': formatted_time,
+                'seconds': seconds
+            })
+    activity_data = fetch_api_data(f"/api/pets/{animal_id}/top-activities")
+    if not activity_data:
+        activity_data = []
+    else:
+        # Ограничиваем количество отображаемых активностей до 3
+        activity_data = activity_data[:3]
+
+    return render_template(
+        "pets_stat_workers.html",
+        animal=animal_data,
+        animal_photo_url=url_for('get_pet_photo', pet_id=animal_id),
+        animal_id=animal_id,
+        video=video,
+        grouped_activities=grouped_activities,
+        activity_data=activity_data
+    )
+
+
+@app.route("/auth_for_workers", methods=['GET', 'POST'])
+def auth_for_workers():
+    if 'auth_token' in session:
+        return redirect(url_for('stat_and_video_workers'))
+
+    if request.method == 'POST':
+        # Пример успешного ответа
+        # login_data = API_EXAMPLES["auth_response"]
+        # Реальный запрос:
+        login_data = fetch_api_data(
+            "/api/auth/login",
+            method='POST',
+            data={
+                "login": request.form.get('login'),
+                "password": request.form.get('password')
+            }
+        )
+        # app.logger.debug(f"🔐 Returned token and shelter_id by API: {login_data}")
+        if login_data:
+            session['auth_token'] = login_data["token"]
+            session["shelter_id"] = login_data["shelterId"]
+            # app.logger.debug(f"🔐 Added in session: {dict(session)}")
+            return redirect(url_for('stat_and_video_workers'))
+
+
+        return render_template(
+            "auth_for_workers.html",
+            error="Неверный логин или пароль")
+
+    return render_template("auth_for_workers.html")
+
+
+@app.route("/add_animal", methods=['GET', 'POST'])
+@login_required
+def add_animal():
+    with open('/root/home/impl/frontend/static/breeds/dogs.json', 'r', encoding='utf-8') as f:
+        dog_breeds = json.load(f)
+    if request.method == 'POST':
+        name = request.form.get('name')
+        description = request.form.get('description')
+        group = request.form.get('group')
+        try:
+            age = int(request.form.get('age'))
+            weight = float(request.form.get('weight'))
+            height = float(request.form.get('height'))
+        except (ValueError, TypeError):
+            return render_template(
+                'add_animal.html',
+                error="Некорректные числовые данные, попробуйте снова", dog_breeds=dog_breeds)
+        breed = request.form.get('breed')
+        species = request.form.get('species', 'Собака')
+
+        main_photo_file = request.files.get('main_photo')
+        if not main_photo_file:
+            return render_template(
+                'add_animal.html',
+                error="Основное фото не выбрано, попробуйте снова", dog_breeds=dog_breeds)
+        files = {
+            'file': (
+                main_photo_file.filename,
+                main_photo_file.stream,
+                main_photo_file.mimetype)}
+        main_temp_response = fetch_api_data(
+            "/api/uploads/temp", method='POST', files=files)
+        if not main_temp_response or 'tempId' not in main_temp_response:
+            app.logger.debug(f"🔐 Main_temp_response: {main_temp_response} ")
+            return render_template(
+                'add_animal.html',
+                error="Ошибка загрузки основного фото, попробуйте снова", dog_breeds=dog_breeds)
+        mainImageId = main_temp_response['tempId']
+
+        additional_photos = request.files.getlist('additional_photos')
+        if len(additional_photos) != 8:
+            return render_template(
+                'add_animal.html',
+                error="Вы отправили не 8 дополнительных фото, попробуйте снова", dog_breeds=dog_breeds)
+        tempImageIds = []
+        for photo in additional_photos:
+            files = {'file': (photo.filename, photo.stream, photo.mimetype)}
+            temp_response = fetch_api_data(
+                "/api/uploads/temp", method='POST', files=files)
+            if not temp_response or 'tempId' not in temp_response:
+                return render_template(
+                    'add_animal.html',
+                    error="Ошибка загрузки дополнительных фото, попробуйте снова", dog_breeds=dog_breeds)
+            tempImageIds.append(temp_response['tempId'])
+
+        pet_data = {
+            "name": name,
+            "age": age,
+            "weight": weight,
+            "description": description,
+            "group": group,
+            "height": height,
+            "breed": breed,
+            "species": species,
+            "mainImageId": mainImageId,
+            "tempImageIds": tempImageIds
+        }
+
+        status = fetch_api_data("/api/pets/add", method='POST', data=pet_data)
+        if status is None:
+            return redirect(url_for('stat_and_video_workers'))
+        return render_template(
+            'add_animal.html',
+            error="Ошибка добавления животного")
+
+
+    return render_template('add_animal.html', dog_breeds=dog_breeds)
+
+
+@app.route("/delete_animal/<int:animal_id>", methods=['POST'])
+@login_required
+def delete_animal(animal_id):
+    deletion_result = fetch_api_data(
+        f"/api/pets/{animal_id}/delete",
+        method='DELETE')
+    if deletion_result is None:
+        return redirect(url_for('stat_and_video_workers'))
+    else:
+        error_message = "Ошибка удаления животного"
+        return render_template(
+            "stat_and_video_workers.html",
+            error=error_message)
+
+
+@app.route("/get_pet_photo/<int:pet_id>")
+def get_pet_photo(pet_id):
+    headers = {}
+    if 'auth_token' in session:
+        headers['Authorization'] = f'Bearer {session["auth_token"]}'
+    try:
+        response = requests.get(
+            f"{base_url}/api/pets/{pet_id}/photo",
+            headers=headers)
+        response.raise_for_status()
+        mimetype = response.headers.get("Content-Type", "image/jpeg")
+        return Response(response.content, mimetype=mimetype)
+    except Exception as e:
+        print(f"Error retrieving pet photo: {e}")
+        return redirect(url_for('static', filename='photo/dog.jpg'))
+
+
+@app.route("/get_pet_video/<int:pet_id>")
+def get_pet_video(pet_id):
+    headers = {}
+    if 'auth_token' in session:
+        headers['Authorization'] = f'Bearer {session["auth_token"]}'
+
+    try:
+        range_header = request.headers.get('Range', None)
+        req_headers = {'Range': range_header} if range_header else {}
+        req_headers.update(headers)
+
+        response = requests.get(
+            f"{base_url}/api/pets/{pet_id}/video",
+            headers=req_headers,
+            stream=True
+        )
+
+        response.raise_for_status()
+
+        mimetype = response.headers.get("Content-Type", "video/mp4")
+        content_length = response.headers.get('Content-Length')
+        content_range = response.headers.get('Content-Range')
+
+        res_headers = {}
+        if content_length:
+            res_headers['Content-Length'] = content_length
+        if content_range:
+            res_headers['Content-Range'] = content_range
+        if range_header:
+            res_headers['Accept-Ranges'] = 'bytes'
+            res_status = 206
+        else:
+            res_status = 200
+
+        return Response(
+            response.iter_content(chunk_size=1024 * 1024),
+            status=res_status,
+            mimetype=mimetype,
+            headers=res_headers,
+            direct_passthrough=True
+        )
+
+    except Exception as e:
+        print(f"Error retrieving pet video: {e}")
+        return redirect(url_for('static', filename='video/placeholder.mp4'))
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True, port=5001)

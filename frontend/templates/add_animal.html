@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='photo/image.png') }}"
+    />
+    <meta charset="UTF-8" />
+    <title>Добавление нового животного</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='add_animal.css') }}"
+    />
+  </head>
+  <body>
+    <main class="add-animal-main">
+      <h1 class="page-title">Добавить новое животное</h1>
+      {% if error %}
+      <div id="serverError">{{ error }}</div>
+      {% endif %}
+      <div id="formError"></div>
+      <form
+        action="{{ url_for('add_animal') }}"
+        method="POST"
+        class="add-animal-form"
+        enctype="multipart/form-data"
+        id="addAnimalForm"
+      >
+        <div class="form-group">
+          <label for="name">Имя животного</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="Введите имя животного"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Описание</label>
+          <textarea
+            id="description"
+            name="description"
+            placeholder="Опишите характер и особенности"
+            rows="4"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="species">Вид животного</label>
+          <div class="custom-select">
+            <select id="species" name="species" required>
+              <option value="" disabled selected>-</option>
+              <option value="Собака">Собака</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="age">Возраст</label>
+            <div class="input-container">
+              <input
+                type="number"
+                id="age"
+                name="age"
+                min="0"
+                max="100"
+                step="1"
+                placeholder="0"
+                required
+              />
+              <span class="unit">лет</span>
+            </div>
+            <span class="error-message" id="age-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="weight">Вес</label>
+            <div class="input-container">
+              <input
+                type="number"
+                id="weight"
+                name="weight"
+                min="0"
+                max="200"
+                step="0.1"
+                placeholder="0.0"
+                required
+              />
+              <span class="unit">кг</span>
+            </div>
+            <span class="error-message" id="weight-error"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="height">Рост</label>
+            <div class="input-container">
+              <input
+                type="number"
+                id="height"
+                name="height"
+                min="0"
+                max="2"
+                step="0.01"
+                placeholder="0.0"
+                required
+              />
+              <span class="unit">м</span>
+            </div>
+            <span class="error-message" id="height-error"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="group">Группа</label>
+          <div class="input-container">
+            <input
+              type="number"
+              id="group"
+              name="group"
+              min="1"
+              step="1"
+              placeholder="Введите номер группы"
+              required
+            />
+          </div>
+          <span class="error-message" id="group-error"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="breed">Порода (обратите внимание, используются полные наименования)</label>
+          <div class="custom-select">
+            <select id="breed" name="breed" required>
+              <option value="" disabled selected>-</option>
+              {% for breed in dog_breeds %}
+              <option value="{{ breed }}">{{ breed }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="main-photo">Основное фото для карточки питомца (JPG <1MB):</label>
+          <div
+            class="file-upload-container"
+            id="main-file-upload"
+            ondragover="handleDragOver(event)"
+            ondrop="handleDrop(event, 'main')"
+          >
+            <label for="main-photo" class="file-upload-label">
+              <span class="file-upload-button">Выбрать файл</span>
+              <input
+                type="file"
+                id="main-photo"
+                name="main_photo"
+                accept="image/jpg"
+                required
+              />
+            </label>
+            <div class="file-preview" id="main-file-preview"></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="additional-photos"
+            >Выберите 8 фото вашего питомца в полный рост, где будет явно видна
+            его лицевая часть (JPG <1MB):</label
+          >
+          <div
+            class="file-upload-container"
+            id="additional-file-upload"
+            ondragover="handleDragOver(event)"
+            ondrop="handleDrop(event, 'additional')"
+          >
+            <label for="additional-photos" class="file-upload-label">
+              <span class="file-upload-button">Выбрать файлы</span>
+              <input
+                type="file"
+                id="additional-photos"
+                name="additional_photos"
+                accept="image/jpg"
+                multiple
+              />
+            </label>
+            <div class="file-preview" id="additional-file-preview"></div>
+          </div>
+        </div>
+
+        <div class="form-buttons">
+          <a href="{{ url_for('stat_and_video_workers') }}" class="cancel-btn"
+            >Отмена</a
+          >
+          <button type="submit" class="submit-btn">Добавить</button>
+        </div>
+      </form>
+      <div class="photo-reminder" id="photoReminder">
+        Вы еще не выполнили условия прикрепления фото (прикрепите 1 основное и 8 дополнительных фото формата JPG <1MB)
+      </div>
+    </main>
+
+    <script>
+      // Функция валидации числовых данных (оставляем без изменений)
+      function validateNumberInput(input, min, max, maxDecimals, errorElement) {
+        const value = input.value.trim();
+        const number = parseFloat(value);
+        let error = "";
+        if (isNaN(number)) {
+          error = "Введите корректное число";
+        } else if (number < min) {
+          error = `Минимум: ${min}`;
+        } else if (number > max) {
+          error = `Максимум: ${max}`;
+        } else {
+          const decimalPart = value.split(".")[1];
+          if (decimalPart && decimalPart.length > maxDecimals) {
+            error = `Не более ${maxDecimals} знаков после запятой`;
+          }
+        }
+        errorElement.textContent = error;
+        input.style.borderColor = error ? "#ff0000" : "";
+        input.setCustomValidity(error);
+        return !error;
+      }
+
+      function initValidation() {
+        const ageInput = document.getElementById("age");
+        const weightInput = document.getElementById("weight");
+        const heightInput = document.getElementById("height");
+        const validators = {
+          age: { min: 0, max: 100, decimals: 0 },
+          weight: { min: 0, max: 200, decimals: 3 },
+          height: { min: 0, max: 2, decimals: 3 },
+          group: { min: 1, max: 100000000000000000, decimals: 0 },
+        };
+        [ageInput, weightInput, heightInput, document.getElementById("group")].forEach((input) => {
+          input.addEventListener("input", function () {
+            const config = validators[this.id];
+            const errorElement = document.getElementById(this.id + "-error");
+            validateNumberInput(this, config.min, config.max, config.decimals, errorElement);
+          });
+        });
+      }
+
+      // Глобальные переменные для управления списком дополнительных файлов
+      let additionalFilesArray = [];
+      let additionalFilesDT = new DataTransfer();
+
+      function initFileUpload() {
+        const mainFileInput = document.getElementById("main-photo");
+        const mainPreview = document.getElementById("main-file-preview");
+        const additionalFileInput = document.getElementById("additional-photos");
+        const additionalPreview = document.getElementById("additional-file-preview");
+
+        mainPreview.innerHTML = "";
+        additionalPreview.innerHTML = "";
+
+        // Обработка выбора основного фото
+        mainFileInput.addEventListener("change", function () {
+          if (this.files && this.files[0]) {
+            const file = this.files[0];
+            const allowedMime = "image/jpeg";
+            const fileNameValid = file.name.toLowerCase().endsWith('.jpg');
+            // Проверка размера файла: ограничение 1 Мб (1 Мб = 1048576 байт)
+            if (file.size > 1048576) {
+              document.getElementById("formError").innerText = "Файл не должен превышать 1 Мб.";
+              this.value = "";
+              return;
+            }
+
+            if (file.type !== allowedMime || !fileNameValid) {
+              document.getElementById("formError").innerText =
+                "Разрешены только файлы с расширением .jpg для фото!";
+              this.value = "";
+              return;
+            }
+            document.getElementById("formError").innerText = "";
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              mainPreview.innerHTML = `
+              <div class="preview-main">
+                <img src="${e.target.result}" alt="Основное фото" class="preview-img">
+                <div class="preview-caption">${mainFileInput.files[0].name}</div>
+                <button type="button" class="file-remove-btn" onclick="removeFile('main')">×</button>
+              </div>
+              `;
+            };
+            reader.readAsDataURL(this.files[0]);
+          }
+          updatePhotoReminder();
+        });
+
+        // Обработка выбора через проводник для дополнительных фото
+        additionalFileInput.addEventListener("change", function () {
+        const newFiles = Array.from(this.files);
+        if (newFiles.length === 0) return;
+        // Проверка типа и размера файлов
+        for (let file of newFiles) {
+          if (file.size > 1048576) {
+            document.getElementById("formError").innerText = "Каждый файл не должен превышать 1 Мб.";
+            return;
+          }
+          if (file.type !== "image/jpeg" || !file.name.toLowerCase().endsWith('.jpg')) {
+            document.getElementById("formError").innerText = "Все дополнительные файлы должны быть с расширением .jpg!";
+            return;
+          }
+        }
+        // Объединяем текущее состояние с новыми файлами
+        let combinedFiles = additionalFilesArray.concat(newFiles);
+        if (combinedFiles.length > 8) {
+          combinedFiles = combinedFiles.slice(combinedFiles.length - 8);
+        }
+        additionalFilesArray = combinedFiles;
+        additionalFilesDT = new DataTransfer();
+        additionalFilesArray.forEach(file => additionalFilesDT.items.add(file));
+
+        this.files = additionalFilesDT.files;
+        renderAdditionalPreviews();
+        updatePhotoReminder();
+        // НЕ сбрасываем значение поля, чтобы файлы остались для отправки
+        // this.value = "";
+      });
+
+      }
+
+      // Функция отрисовки превью для дополнительных фото
+      function renderAdditionalPreviews() {
+        const additionalPreview = document.getElementById("additional-file-preview");
+        additionalPreview.innerHTML = "";
+        const files = document.getElementById("additional-photos").files;
+        Array.from(files).forEach((file, index) => {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const previewItem = document.createElement("div");
+            previewItem.className = "preview-item";
+            previewItem.innerHTML = `
+            <img src="${e.target.result}" alt="Дополнительное фото" class="preview-img">
+            <div class="preview-caption">${file.name}</div>
+            <button type="button" class="file-remove-btn" onclick="removeAdditionalFile(${index})">×</button>
+            `;
+            additionalPreview.appendChild(previewItem);
+          };
+          reader.readAsDataURL(file);
+        });
+        additionalPreview.style.display = files.length ? "block" : "none";
+      }
+
+      // Функция удаления дополнительного фото по индексу
+      function removeAdditionalFile(index) {
+        additionalFilesDT.items.remove(index);
+        // Обновляем глобальный массив после удаления
+        additionalFilesArray = Array.from(additionalFilesDT.files);
+        const input = document.getElementById("additional-photos");
+        input.files = additionalFilesDT.files;
+        renderAdditionalPreviews();
+        updatePhotoReminder();
+      }
+
+      // Обработка drag&drop для обоих типов файлов
+      function handleDragOver(event) {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "copy";
+      }
+
+      function handleDrop(event, type) {
+        event.preventDefault();
+        const files = Array.from(event.dataTransfer.files);
+        if (files.length === 0) return;
+
+        if (type === "main") {
+          const mainInput = document.getElementById("main-photo");
+          const mainPreview = document.getElementById("main-file-preview");
+          const file = files[0];
+          const allowedMime = "image/jpeg";
+          const fileNameValid = file.name.toLowerCase().endsWith('.jpg');
+
+          if (file.size > 1048576) {
+            document.getElementById("formError").innerText = "Файл не должен превышать 1 Мб.";
+            return;
+          }
+
+          if (file.type !== allowedMime || !fileNameValid) {
+            document.getElementById("formError").innerText = "Разрешены только файлы с расширением .jpg для основного фото!";
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            mainPreview.innerHTML = `
+              <div class="preview-main">
+                <img src="${e.target.result}" alt="Основное фото" class="preview-img">
+                <div class="preview-caption">${file.name}</div>
+                <button type="button" class="file-remove-btn" onclick="removeFile('main')">×</button>
+              </div>
+            `;
+          };
+          reader.readAsDataURL(file);
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          document.getElementById("main-photo").files = dt.files;
+          document.getElementById("formError").innerText = "";
+          updatePhotoReminder();
+        }
+
+        if (type === "additional") {
+          const additionalInput = document.getElementById("additional-photos");
+          const newFiles = files;
+          if (newFiles.length === 0) return;
+          const allowedMime = "image/jpeg";
+          for (let file of newFiles) {
+            if (file.size > 1048576) {
+              document.getElementById("formError").innerText = "Файл не должен превышать 1 Мб.";
+              return;
+            }
+            if (file.type !== allowedMime || !file.name.toLowerCase().endsWith('.jpg')) {
+              document.getElementById("formError").innerText = "Все дополнительные файлы должны быть с расширением .jpg!";
+              return;
+            }
+          }
+          // Объединяем уже выбранные файлы и новые
+          let currentFiles = Array.from(additionalFilesDT.files);
+          let combinedFiles = currentFiles.concat(newFiles);
+          // Если общий список превышает 8, оставляем последние 8 файлов (то есть новые заменяют старые)
+          if (combinedFiles.length > 8) {
+            combinedFiles = combinedFiles.slice(combinedFiles.length - 8);
+          }
+          additionalFilesDT = new DataTransfer();
+          combinedFiles.forEach(file => additionalFilesDT.items.add(file));
+          // Обновляем глобальный массив
+          additionalFilesArray = Array.from(additionalFilesDT.files);
+          additionalInput.files = additionalFilesDT.files;
+          renderAdditionalPreviews();
+          updatePhotoReminder();
+        }
+      }
+
+      // Функция удаления основного фото
+      function removeFile(type) {
+        if (type === "main") {
+          const input = document.getElementById("main-photo");
+          const preview = document.getElementById("main-file-preview");
+          input.value = "";
+          preview.innerHTML = "";
+          updatePhotoReminder();
+        }
+      }
+
+      document.getElementById("addAnimalForm").addEventListener("submit", function (e) {
+      const additionalInput = document.getElementById("additional-photos");
+      additionalInput.files = additionalFilesDT.files;
+      if (additionalInput.files.length !== 8) {
+        e.preventDefault();
+        document.getElementById("formError").innerText = "Вы отправили не 8 дополнительных фото, попробуйте снова";
+      }
+    });
+
+
+      document.addEventListener("DOMContentLoaded", function () {
+        initFileUpload();
+        initValidation();
+      });
+
+      // Функция обновления напоминания – смотрим по глобальному массиву
+      function updatePhotoReminder() {
+        const reminder = document.getElementById("photoReminder");
+        const mainFiles = document.getElementById("main-photo").files.length;
+        const additionalCount = additionalFilesArray.length;
+        reminder.style.display = mainFiles === 0 || additionalCount < 8 ? "flex" : "none";
+      }
+    </script>
+  </body>
+</html>

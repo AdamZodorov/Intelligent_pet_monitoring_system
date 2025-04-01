@@ -1,27 +1,76 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Информация по приюту</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='stat_and_video_clients.css') }}">
-</head>
-<body>
+  <head>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='photo/image.png') }}"
+    />
+    <meta charset="UTF-8" />
+    <title>Информация о приюте</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='stat_and_video_clients.css') }}"
+    />
+  </head>
+  <body>
     <main class="shelter-info-main">
-        <h1 class="page-title">Информация по приюту</h1>
-        <!-- Вывод ID приюта -->
-        <p class="shelter-id">ID приюта: {{ shelter_id }}</p>
+      <div class="header-info">
+        <h1 class="page-title">{{ shelter.name }}</h1>
+        <!-- <p class="shelter-id">ID приюта: {{ shelter.id }}</p> -->
+        {% if shelter.description %}
+        <p class="shelter-description">{{ shelter.description }}</p>
+        {% endif %}
+      </div>
 
-        <!-- Секция со списком животных -->
-        <section class="animals-list-container">
-            {% for animal in animals %}
-            <!-- Оборачиваем всю карточку животного в ссылку -->
-            <a href="{{ url_for('pets_stat_users', animal_id=animal.id) }}" class="animal-item">
-                <h3 class="animal-name">{{ animal.name }}</h3>
-                <p class="animal-stats">{{ animal.description }}</p>
+      <section class="animals-grid">
+        {% for animal in animals %}
+        <a
+          href="{{ url_for('pets_stat_users', animal_id=animal.id) }}"
+          class="animal-card"
+        >
+          {% if animal.photos and animal.photos|length > 0 %}
+          <img
+            src="{{ url_for('get_pet_photo', pet_id=animal.id) }}"
+            alt="{{ animal.name }}"
+            class="animal-image"
+          />
+          {% else %}
+          <img
+            src="{{ url_for('static', filename='photo/dog.jpg') }}"
+            alt="{{ animal.name }}"
+            class="animal-image"
+          />
+          {% endif %}
+
+          <div class="animal-info">
+            <h3 class="animal-name">{{ animal.name }}</h3>
+
+            <div class="animal-meta">
+              <span class="animal-type">
+                <span class="icon"></span>
+                {{ animal.species }}
+              </span>
+              <span class="animal-age">
+                <span class="icon"></span>
+                {{ animal.age }} {{ animal.age | russian_years }}
+              </span>
+              <span class="animal-breed">
+                <span class="icon"></span>
+                {{ animal.breed }}
+              </span>
+            </div>
+          </div>
+        </a>
+        {% endfor %}
+      </section>
+
+      <!-- {% if shelter.website %}
+        <div class="shelter-website-container">
+            <a href="{{ shelter.website }}" class="shelter-website" target="_blank">
+                Сайт приюта
             </a>
-            {% endfor %}
-        </section>
-
+        </div>
+        {% endif %} -->
     </main>
-</body>
+  </body>
 </html>

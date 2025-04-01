@@ -1,30 +1,49 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
+  <head>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='photo/image.png') }}"
+    />
     <meta charset="UTF-8" />
     <title>Вход для работников приюта</title>
-    <!-- Подключаем файл стилей -->
     <link
-    rel="stylesheet"
-    href="{{ url_for('static', filename='auth_for_workers.css') }}"
->
-</head>
-<body>
-    <!-- Основная часть страницы -->
+      rel="stylesheet"
+      href="{{ url_for('static', filename='auth_for_workers.css') }}"
+    />
+  </head>
+  <body>
     <main>
-        <!-- Заголовок и форма авторизации -->
-        <section class="auth-section">
-            <h1 class="auth-title">Вход для работников приюта</h1>
-            <form class="auth-form" action="#" method="post">
-                <label for="login" class="auth-label">Логин</label>
-                <input type="text" id="login" name="login" class="auth-input" placeholder="Введите логин" />
+      <section class="auth-section">
+        <h1 class="auth-title">Вход для работников приюта</h1>
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
 
-                <label for="password" class="auth-label">Пароль</label>
-                <input type="password" id="password" name="password" class="auth-input" placeholder="Введите пароль" />
+        {% endif %}
+        <form class="auth-form" method="post">
+          <label for="login" class="auth-label">Логин</label>
+          <input
+            type="text"
+            id="login"
+            name="login"
+            class="auth-input"
+            required
+            placeholder="Введите логин"
+          />
 
-                <button type="submit" class="btn-auth" id="login-btn">Войти</button>
-            </form>
-        </section>
+          <label for="password" class="auth-label">Пароль</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="auth-input"
+            required
+            placeholder="Введите пароль"
+          />
+
+          <button type="submit" class="btn-auth">Войти</button>
+        </form>
+      </section>
     </main>
-</body>
+  </body>
 </html>

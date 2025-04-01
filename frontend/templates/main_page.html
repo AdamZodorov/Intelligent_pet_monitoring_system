@@ -1,33 +1,44 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
+  <head>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='photo/image.png') }}"
+    />
     <meta charset="UTF-8" />
     <title>Главная страница</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='main_page.css') }}">
-</head>
-<body>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='main_page.css') }}"
+    />
+  </head>
+  <body>
     <header class="header">
-        <!-- Ссылка для входа работников -->
-        <a href="{{ url_for('auth_for_workers') }}" class="btn-profile" id="worker-profile-btn">
-            Вход для работников приюта
-        </a>
+      <a
+        href="{{ url_for('auth_for_workers') }}"
+        class="btn-profile"
+        id="worker-profile-btn"
+      >
+        Вход для работников приюта
+      </a>
     </header>
 
     <main>
-        <section class="search-section">
-            <!-- Оборачиваем в форму для отправки параметра запроса -->
-            <form id="searchForm" action="{{ url_for('search_for_clients') }}" method="GET">
-                <label for="shelter-address" class="search-label">Введите адрес приюта</label>
-                <input
-                    type="text"
-                    id="shelter-address"
-                    name="query"
-                    class="search-input"
-                    placeholder="Проектируемый пр. № 5112, 1-3, Москва"
-                />
-                <button type="submit" class="btn-search" id="search-shelter-btn">Найти</button>
-            </form>
-        </section>
+      <section class="results-section">
+        {% for shelter in shelters %}
+
+        <a
+          class="shelter-item"
+          href="{{ url_for('stat_and_video_clients', shelter_id=shelter.id) }}"
+        >
+          <div class="shelter-info">
+            <h3 class="shelter-name">{{ shelter.name }}</h3>
+            <p class="shelter-address">{{ shelter.description }}</p>
+          </div>
+        </a>
+
+        {% endfor %}
+      </section>
     </main>
-</body>
+  </body>
 </html>

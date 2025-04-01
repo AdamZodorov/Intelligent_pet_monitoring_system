@@ -1,100 +1,302 @@
-/* Сброс базовых отступов и шрифтов */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    color: #000000;
-    background-color: #FFFFFF;
+  font-family: Arial, sans-serif;
+  color: #000000;
+  background-color: #ffffff;
 }
 
-/* Шапка */
 .header {
-    display: flex;
-    justify-content: flex-end; /* Кнопка справа */
-    align-items: center;
-    padding: 20px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 20px;
 }
 
-/* Кнопка входа для рабочего профиля */
 .btn-profile {
-    background-color: #000000; /* Черный фон */
-    color: #FFFFFF;            /* Белый текст */
-    border: none;
-    border-radius: 5px;        /* Скругленные углы */
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
 }
 .btn-profile:hover {
-    background-color: #333333; /* Эффект при наведении */
+  background-color: #333333;
 }
 
-/* Основная часть */
 main {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto; /* Центрируем содержимое */
-    padding: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
 }
 
-/* Секция поиска */
 .search-section {
-    /* Центрируем сам блок по горизонтали */
-    margin: 50px auto;
-    /* Задаём фиксированную ширину для блока */
-    width: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Внутри блока элементы остаются слева */
+  margin: 50px auto;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .search-label {
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
 .search-input {
-    width: 100%;            /* Ширина на всю доступную ширину родителя */
-    padding: 10px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    margin-bottom: 10px;    /* Небольшой отступ перед кнопкой */
-    border-radius: 5px;     /* Скругленные углы у поля ввода */
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  border-radius: 5px;
 }
 
 .btn-search {
-    width: 100%;            /* Ширина на всю доступную ширину родителя */
-    background-color: #000000;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 5px;     /* Скругленные углы */
-    padding: 10px 0;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s;
+  width: 100%;
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
 }
 .btn-search:hover {
-    background-color: #333333;
+  background-color: #333333;
 }
 
 .btn-profile {
-    /* Ваши существующие стили для кнопки */
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #000;
-    color: white;
-    text-decoration: none; /* Убираем подчеркивание */
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s;
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #000;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .btn-profile:hover {
-    background-color: #333;
+  background-color: #333;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: normal;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.login-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.login-container {
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.login-title {
+  font-size: 24px;
+  margin-bottom: 30px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.btn-submit {
+  width: 100%;
+  background-color: #000000;
+  color: #ffffff;
+  padding: 12px 0;
+  font-size: 16px;
+  border-radius: 5px;
+}
+.btn-submit:hover {
+  background-color: #333333;
+}
+
+.search-main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 20px 100px;
+}
+
+.search-field-container {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.search-field {
+  width: 400px;
+  max-width: 90%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px;
+}
+
+.shelter-item {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding: 15px;
+  transition: background-color 0.2s;
+}
+
+.shelter-item:hover {
+  background-color: #ffe4e1;
+}
+
+.shelter-info {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.shelter-name {
+  font-size: 18px;
+  margin-bottom: 5px;
+}
+
+.shelter-address {
+  font-size: 14px;
+  color: #666666;
+}
+
+.btn-view {
+  background-color: #000000;
+  color: #ffffff;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+}
+.btn-view:hover {
+  background-color: #333333;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.footer {
+  background-color: #f9f9f9;
+  padding: 20px 0;
+  border-top: 1px solid #ccc;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.footer-heading {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.footer-topics {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 20px;
+}
+
+.topic-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.topic-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.topic-page {
+  font-size: 14px;
+  color: #333333;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.social-icons a {
+  text-decoration: none;
+  color: #000;
+}
+
+.shelter-link {
+  color: #c30e0e;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.shelter-link:hover {
+  text-decoration: none;
 }

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='photo/image.png') }}"
+    />
+    <meta charset="UTF-8" />
+    <title>Как так...</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='error.css') }}"
+    />
+  </head>
+  <body>
+    <div class="error-container">
+      <h1 class="error-title">Что-то пошло не так...</h1>
+      <p class="error-message">{{ error }}</p>
+      <a class="back-button" href="{{ url_for('main_page') }}"
+        >Вернуться на главную</a
+      >
+    </div>
+  </body>
+</html>
